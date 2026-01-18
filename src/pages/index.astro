@@ -1,11 +1,28 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import BaseLayout from "../layouts/BaseLayout.astro";
+const REQUEST_EMAIL = "info@alimovafoundation.org";
 ---
+<BaseLayout title="VDR — доступ за запитом">
+  <section class="hero">
+    <h1>Virtual Data Room</h1>
+    <p>Доступ надається за запитом. Всі дії логуються. Документи мають версійність.</p>
+    <div class="btns" id="access">
+      <a class="btn primary" href={`mailto:${REQUEST_EMAIL}?subject=VDR%20Access%20Request&body=Hello!%20Please%20grant%20me%20access%20to%20VDR.%0A%0AName:%0AOrg:%0ARole:%0AEmail:%0ARequested%20rooms:%20(donor/partner/procurement/board)%0AReason:%0A`}>
+        Request access
+      </a>
+      <a class="btn" href="/rooms/">Open rooms (login)</a>
+    </div>
+    <p class="meta">Порада: якщо вас “питає логін” — це нормально. Так і має бути 🙂</p>
+  </section>
 
-<Layout>
-	<Welcome />
-</Layout>
+  <div class="grid">
+    <section class="card">
+      <h2>Що всередині</h2>
+      <p>Пакети для донорів, партнерів, закупівель і управління. Кожен пакет має власний доступ і логування.</p>
+    </section>
+    <section class="card">
+      <h2>Як ми захищаємо</h2>
+      <p>Контроль доступу через Cloudflare Access, сесії з тайм-аутом, політики ALLOW/BLOCK, аудит подій.</p>
+    </section>
+  </div>
+</BaseLayout>
