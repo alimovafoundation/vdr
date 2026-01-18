@@ -1,0 +1,58 @@
+---
+const { title = "VDR" } = Astro.props;
+---
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <style>
+      :root{
+        --pink:#D41B52; --yellow:#FFED00; --blue:#009FE3; --ink:#111; --bg:#fff;
+        --card:#f7f7f8; --line:rgba(0,0,0,.08);
+      }
+      *{box-sizing:border-box}
+      body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+      a{color:inherit}
+      .wrap{max-width:1040px;margin:0 auto;padding:28px 18px}
+      .top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+      .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+      .mark{width:14px;height:14px;border-radius:4px;background:conic-gradient(from 180deg, var(--pink), var(--yellow), var(--blue), var(--pink))}
+      .nav{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;opacity:.85}
+      .hero{margin-top:26px;padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg, rgba(212,27,82,.08), rgba(0,159,227,.06), rgba(255,237,0,.10))}
+      h1{margin:0 0 8px;font-size:32px;letter-spacing:-.02em}
+      p{margin:8px 0;line-height:1.55}
+      .grid{display:grid;gap:14px;grid-template-columns:repeat(12,1fr);margin-top:16px}
+      .card{grid-column:span 6;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+      .card h2{margin:0 0 6px;font-size:18px}
+      .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+      .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);text-decoration:none;background:#fff}
+      .btn.primary{background:var(--pink);border-color:var(--pink);color:#fff}
+      .meta{margin-top:18px;font-size:13px;opacity:.75}
+      @media (max-width:800px){ .card{grid-column:span 12} h1{font-size:28px} }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="/">
+          <span class="mark" aria-hidden="true"></span>
+          <strong>VDR</strong>
+        </a>
+        <nav class="nav">
+          <a href="/rooms/">Кімнати</a>
+          <a href="/#access">Доступ</a>
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      <footer class="meta">
+        © {new Date().getFullYear()} Alimova Foundation — Virtual Data Room
+      </footer>
+    </div>
+  </body>
+</html>
