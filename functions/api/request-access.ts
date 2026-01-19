@@ -1,44 +1,48 @@
-export const onRequestPost: PagesFunction<{
-  TURNSTILE_SECRET: string;
-}> = async ({ request, env }) => {
+export const onRequestPost = async ({ request, env }: any) => {
   try {
-    const body = await request.json().catch(() => ({}));
+    let email = "";
+    let purpose = "";
+    let token = "";
 
-    const email = String(body.email || "").trim();
-    const purpose = String(body.purpose || "").trim();
-    const token = String(body.token || "").trim();
+    const ct = request.headers.get("content-type") || "";
 
-    if (!email || !purpose) {
-      return json({ error: "Missing email or purpose" }, 400);
+    if (ct.includes("application/json")) {
+      const body = await request.json().catch(() => ({}));
+      email = String(body.email || "").trim();
+      purpose = String(body.purpose || "").trim();
+      token = String(body.token || "").trim();
+    } else {
+      const form = await request.formData();
+      email = String(form.get("email") || "").trim();
+      purpose = String(form.get("purpose") || "").trim();
+      token =
+        String(form.get("token") || "").trim() ||
+        String(form.get("cf-turnstile-response") || "").trim();
     }
-    if (!token) {
-      return json({ error: "Missing Turnstile token" }, 400);
-    }
-    if (!env.TURNSTILE_SECRET) {
-      return json({ error: "Server misconfigured: TURNSTILE_SECRET missing" }, 500);
-    }
+
+    if (!email || !purpose) return json({ error: "Missing email or purpose" }, 400);
+    if (!token) return json({ error: "Missing Turnstile token" }, 400);
+    if (!env.TURNSTILE_SECRET) return json({ error: "TURNSTILE_SECRET missing" }, 500);
 
     const ip =
       request.headers.get("CF-Connecting-IP") ||
-      request.headers.get("X-Forwarded-For") ||
-      "";
+      (request.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() ?? "");
 
-    const formData = new FormData();
-    formData.append("secret", env.TURNSTILE_SECRET);
-    formData.append("response", token);
-    if (ip) formData.append("remoteip", ip);
+    const params = new URLSearchParams();
+    params.set("secret", env.TURNSTILE_SECRET);
+    params.set("response", token);
+    if (ip) params.set("remoteip", ip);
 
     const verifyResp = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
-      body: formData,
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
     });
 
     const verify = await verifyResp.json().catch(() => ({}));
+    if (!verify?.success) return json({ error: "Turnstile verification failed", details: verify }, 403);
 
-    if (!verify?.success) {
-      return json({ error: "Turnstile verification failed", details: verify }, 403);
-    }
-
+    // TODO: тут буде відправка заявки (email/webhook/queue)
     return json({ ok: true }, 200);
   } catch (e: any) {
     return json({ error: e?.message || "Unexpected error" }, 500);
