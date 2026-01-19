@@ -1,7 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const SITE_KEY = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "")
+  .trim()
+  .replace(/^"+|"+$/g, ""); // прибирає випадкові лапки з початку/кінця
 ---
 
 <BaseLayout title="VDR — Request access">
