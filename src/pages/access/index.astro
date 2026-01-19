@@ -1,0 +1,29 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="VDR — Request access">
+  <section class="hero">
+    <h1>Request access</h1>
+    <p>Доступ надається за запитом. Всі дії логуються. Документи мають версійність.</p>
+
+    <div class="form-card">
+      <form method="post" action="/api/request-access">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="name@company.org" required />
+
+        <label for="purpose">Purpose</label>
+        <input id="purpose" name="purpose" placeholder="Donor due diligence / partnership / procurement…" required />
+
+        <!-- Turnstile widget вставиш тут (cf-turnstile-response) -->
+
+        <div class="btns">
+          <button class="btn primary" type="submit">Submit request</button>
+          <a class="btn" href="/rooms/">Open rooms</a>
+        </div>
+
+        <p class="meta">Після відправки покажемо “Дякуємо, ми відповімо на email”.</p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
