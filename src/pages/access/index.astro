@@ -5,88 +5,38 @@ const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <BaseLayout title="VDR — Request access">
+  <Fragment slot="head">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  </Fragment>
+
   <section class="hero">
     <h1>Request access</h1>
     <p>Доступ надається за запитом. Всі дії логуються. Документи мають версійність.</p>
 
-    {!SITE_KEY ? (
-      <p class="notice err">
-        ⚠️ <strong>PUBLIC_TURNSTILE_SITE_KEY</strong> не заданий у Pages env vars.
-      </p>
-    ) : (
-      <form class="form-card" id="accessForm">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" placeholder="name@company.org" required />
+    <section class="form-card">
+      {!SITE_KEY ? (
+        <p style="color:#b00020;font-weight:600;">
+          ⚠️ PUBLIC_TURNSTILE_SITE_KEY не заданий у Pages env vars.
+        </p>
+      ) : (
+        <form method="POST" action="/api/request-access">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="name@company.org" />
 
-        <label for="purpose">Purpose</label>
-        <input id="purpose" name="purpose" type="text" placeholder="Donor due diligence / partnership / procurement..." required />
+          <label for="purpose">Purpose</label>
+          <input id="purpose" name="purpose" type="text" required placeholder="Donor due diligence / partnership / procurement..." />
 
-        <div style="margin-top:14px">
-          <div
-            class="cf-turnstile"
-            data-sitekey={SITE_KEY}
-            data-theme="light"
-          ></div>
-        </div>
+          <div style="margin:14px 0;">
+            <div class="cf-turnstile" data-sitekey={SITE_KEY}></div>
+            <p class="meta" style="margin-top:10px;">Підтвердіть, що ви не бот (Turnstile).</p>
+          </div>
 
-        <div class="btns" style="margin-top:14px">
-          <button class="btn primary" type="submit">Submit request</button>
-          <a class="btn" href="/">Back</a>
-        </div>
-
-        <div id="msg" class="notice" style="display:none"></div>
-
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
-        <script is:inline>
-          const form = document.getElementById("accessForm");
-          const msg = document.getElementById("msg");
-
-          function setMsg(kind, text){
-            msg.style.display = "block";
-            msg.className = "notice " + (kind === "ok" ? "ok" : "err");
-            msg.textContent = text;
-          }
-
-          form?.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const email = form.email.value.trim();
-            const purpose = form.purpose.value.trim();
-
-            const token =
-              form.querySelector('input[name="cf-turnstile-response"]')?.value ||
-              "";
-
-            if (!token) {
-              setMsg("err", "Підтвердіть, що ви не бот (Turnstile).");
-              return;
-            }
-
-            try {
-              const resp = await fetch("/api/request-access", {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ email, purpose, token }),
-              });
-
-              const data = await resp.json().catch(() => ({}));
-
-              if (!resp.ok) {
-                setMsg("err", data?.error || "Помилка відправки. Спробуйте ще раз.");
-                return;
-              }
-
-              setMsg("ok", "Дякуємо! Ми відповімо на email найближчим часом.");
-              form.reset();
-
-              // Після reset Turnstile інколи лишає старий токен — це нормально.
-            } catch (err) {
-              setMsg("err", "Мережна помилка. Спробуйте ще раз.");
-            }
-          });
-        </script>
-      </form>
-    )}
+          <div class="btns">
+            <button class="btn primary" type="submit">Submit request</button>
+            <a class="btn" href="/">Back</a>
+          </div>
+        </form>
+      )}
+    </section>
   </section>
 </BaseLayout>
