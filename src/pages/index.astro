@@ -1,13 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-const REQUEST_EMAIL = "info@alimovafoundation.org";
 ---
 <BaseLayout title="VDR — доступ за запитом">
   <section class="hero">
     <h1>Virtual Data Room</h1>
     <p>Доступ надається за запитом. Всі дії логуються. Документи мають версійність.</p>
     <div class="btns" id="access">
-      <a class="btn primary" href={`mailto:${REQUEST_EMAIL}?subject=VDR%20Access%20Request&body=Hello!%20Please%20grant%20me%20access%20to%20VDR.%0A%0AName:%0AOrg:%0ARole:%0AEmail:%0ARequested%20rooms:%20(donor/partner/procurement/board)%0AReason:%0A`}>
+      <a class="btn primary" href="/access/">
         Request access
       </a>
       <a class="btn" href="/rooms/">Open rooms (login)</a>
