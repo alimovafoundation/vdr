@@ -1,8 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const RAW_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
-const SITE_KEY = RAW_SITE_KEY.trim().replace(/^"+|"+$/g, "");
+// Pages env var (як у Cloudflare UI)
+const SITE_KEY = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || "").trim();
 ---
 
 <BaseLayout title="VDR — Request access">
@@ -16,8 +16,8 @@ const SITE_KEY = RAW_SITE_KEY.trim().replace(/^"+|"+$/g, "");
 
     <section class="form-card">
       {!SITE_KEY ? (
-        <p style="color:#b00020;font-weight:600;">
-          ⚠️ PUBLIC_TURNSTILE_SITE_KEY не заданий або порожній у Pages env vars.
+        <p style="color:#b00020;font-weight:700;">
+          ⚠️ <strong>PUBLIC_TURNSTILE_SITE_KEY</strong> не заданий у Pages env vars (або потрібен redeploy).
         </p>
       ) : (
         <form method="POST" action="/api/request-access">
