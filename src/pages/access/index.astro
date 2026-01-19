@@ -1,79 +1,92 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
 const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
-<BaseLayout title="Request access — VDR">
-  <main class="container">
+<BaseLayout title="VDR — Request access">
+  <section class="hero">
     <h1>Request access</h1>
     <p>Доступ надається за запитом. Всі дії логуються. Документи мають версійність.</p>
 
     {!SITE_KEY ? (
-      <p style="color:#b00;">⚠️ PUBLIC_TURNSTILE_SITE_KEY не заданий у Pages env vars.</p>
+      <p class="notice err">
+        ⚠️ <strong>PUBLIC_TURNSTILE_SITE_KEY</strong> не заданий у Pages env vars.
+      </p>
     ) : (
-      <>
-        <form id="access-form">
-          <label>
-            Email
-            <input name="email" type="email" required placeholder="name@company.org" />
-          </label>
+      <form class="form-card" id="accessForm">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="name@company.org" required />
 
-          <label>
-            Purpose
-            <input name="purpose" type="text" required placeholder="Donor due diligence / partnership / procurement..." />
-          </label>
+        <label for="purpose">Purpose</label>
+        <input id="purpose" name="purpose" type="text" placeholder="Donor due diligence / partnership / procurement..." required />
 
-          <div class="cf-turnstile" data-sitekey={SITE_KEY}></div>
+        <div style="margin-top:14px">
+          <div
+            class="cf-turnstile"
+            data-sitekey={SITE_KEY}
+            data-theme="light"
+          ></div>
+        </div>
 
-          <button type="submit">Submit request</button>
-          <p id="msg" role="status" style="margin-top:12px;"></p>
-        </form>
+        <div class="btns" style="margin-top:14px">
+          <button class="btn primary" type="submit">Submit request</button>
+          <a class="btn" href="/">Back</a>
+        </div>
+
+        <div id="msg" class="notice" style="display:none"></div>
 
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-        <script>
-          const form = document.getElementById("access-form");
+        <script is:inline>
+          const form = document.getElementById("accessForm");
           const msg = document.getElementById("msg");
 
-          form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            msg.textContent = "Sending…";
+          function setMsg(kind, text){
+            msg.style.display = "block";
+            msg.className = "notice " + (kind === "ok" ? "ok" : "err");
+            msg.textContent = text;
+          }
 
-            const fd = new FormData(form);
-            const token = fd.get("cf-turnstile-response");
+          form?.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = form.email.value.trim();
+            const purpose = form.purpose.value.trim();
+
+            const token =
+              form.querySelector('input[name="cf-turnstile-response"]')?.value ||
+              "";
+
+            if (!token) {
+              setMsg("err", "Підтвердіть, що ви не бот (Turnstile).");
+              return;
+            }
 
             try {
-              const r = await fetch("/api/request-access", {
+              const resp = await fetch("/api/request-access", {
                 method: "POST",
                 headers: { "content-type": "application/json" },
-                body: JSON.stringify({
-                  email: fd.get("email"),
-                  purpose: fd.get("purpose"),
-                  token
-                })
+                body: JSON.stringify({ email, purpose, token }),
               });
 
-              const data = await r.json().catch(() => ({}));
-              if (!r.ok) throw new Error(data?.error || `HTTP ${r.status}`);
+              const data = await resp.json().catch(() => ({}));
 
-              msg.textContent = "✅ Request submitted. We'll get back to you.";
+              if (!resp.ok) {
+                setMsg("err", data?.error || "Помилка відправки. Спробуйте ще раз.");
+                return;
+              }
+
+              setMsg("ok", "Дякуємо! Ми відповімо на email найближчим часом.");
               form.reset();
-              if (window.turnstile) window.turnstile.reset();
+
+              // Після reset Turnstile інколи лишає старий токен — це нормально.
             } catch (err) {
-              msg.textContent = "❌ " + (err?.message || "Failed");
-              if (window.turnstile) window.turnstile.reset();
+              setMsg("err", "Мережна помилка. Спробуйте ще раз.");
             }
           });
         </script>
-      </>
+      </form>
     )}
-  </main>
-
-  <style>
-    .container { max-width: 760px; margin: 48px auto; padding: 0 16px; }
-    h1 { font-size: 40px; margin: 0 0 12px; }
-    label { display:block; margin: 14px 0; }
-    input { width:100%; padding: 10px 12px; font-size: 16px; }
-    button { margin-top: 14px; padding: 10px 14px; font-size: 16px; cursor: pointer; }
-  </style>
+  </section>
 </BaseLayout>

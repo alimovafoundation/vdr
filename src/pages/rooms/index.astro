@@ -1,28 +1,40 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-const rooms = [
-  { href: "/rooms/donor", title: "Donor Room", desc: "Матеріали для донорів: програми, бюджети, impact, прозорість." },
-  { href: "/rooms/partner", title: "Partner Room", desc: "Матеріали для партнерів: співпраця, процеси, інтеграції." },
-  { href: "/rooms/procurement", title: "Procurement Room", desc: "Закупівлі: політики, KYC/контракти, тендерні пакети." },
-  { href: "/rooms/board", title: "Board / Legal Room", desc: "Управління: рішення, юридичні документи, ризики, комплаєнс." },
-];
 ---
+
 <BaseLayout title="VDR — Кімнати">
   <section class="hero">
     <h1>Кімнати VDR</h1>
     <p>Оберіть пакет. Якщо у вас немає доступу — побачите запит на авторизацію.</p>
-    <div class="btns">
+
+    <div class="btns" style="margin-top:14px">
       <a class="btn" href="/">← Back</a>
     </div>
   </section>
 
   <div class="grid">
-    {rooms.map((r) => (
-      <a class="card" href={r.href} style="text-decoration:none">
-        <h2>{r.title}</h2>
-        <p>{r.desc}</p>
-        <p class="meta">Open →</p>
-      </a>
-    ))}
+    <a class="card" href="/rooms/donor/">
+      <h2>Donor Room</h2>
+      <p>Матеріали для донорів: програми, бюджети, impact, прозорість.</p>
+      <p style="margin-top:10px; color:var(--muted)">Open →</p>
+    </a>
+
+    <a class="card" href="/rooms/partner/">
+      <h2>Partner Room</h2>
+      <p>Матеріали для партнерів: співпраця, процеси, інтеграції.</p>
+      <p style="margin-top:10px; color:var(--muted)">Open →</p>
+    </a>
+
+    <a class="card" href="/rooms/procurement/">
+      <h2>Procurement Room</h2>
+      <p>Закупівлі: політики, KYC/контракти, тендерні пакети.</p>
+      <p style="margin-top:10px; color:var(--muted)">Open →</p>
+    </a>
+
+    <a class="card" href="/rooms/board/">
+      <h2>Board / Legal Room</h2>
+      <p>Управління: рішення, юридичні документи, ризики, комплаєнс.</p>
+      <p style="margin-top:10px; color:var(--muted)">Open →</p>
+    </a>
   </div>
 </BaseLayout>
